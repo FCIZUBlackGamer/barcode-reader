@@ -7,6 +7,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,8 +36,12 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -45,7 +50,11 @@ public class HomeActivity extends AppCompatActivity {
     private static final int FILE_SELECT_CODE = 0;
     final File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
     InputStream input;
+    List<String[]> csvContentData;
+    List<Barcode> barcodeList = new ArrayList<>();
     private static final int RC_BARCODE_CAPTURE = 9001;
+    private HashMap<String, String> barcodeData = new HashMap<>();
+    int aiStart = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +70,12 @@ public class HomeActivity extends AppCompatActivity {
                 showFileChooser();
             }
         });
-
         binding.startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HomeActivity.this, BarcodeCaptureActivity.class);
                 intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
                 intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
-
                 startActivityForResult(intent, RC_BARCODE_CAPTURE);
             }
         });
@@ -90,6 +97,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -106,7 +114,8 @@ public class HomeActivity extends AppCompatActivity {
                         } else {
                             path = getPath(this, uri);
                         }
-                        printCVSContent(readCVSFromAssetFolder(path));
+                        csvContentData = readCVSFromAssetFolder(path);
+                        printCVSContent(csvContentData);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     }
@@ -120,16 +129,100 @@ public class HomeActivity extends AppCompatActivity {
             case RC_BARCODE_CAPTURE:
                 if (resultCode == CommonStatusCodes.SUCCESS) {
                     if (data != null) {
-                        Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+
+                        Barcode barcodeObject = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
 //                        statusMessage.setText(R.string.barcode_success);
 //                        barcodeValue.setText(barcode.displayValue);
-                        for (int i = 0; i < barcode.displayValue.length(); i++) {
-                            if (convertStringToHex(barcode.displayValue.charAt(i) + "").equals("1d")){
-                                Toast.makeText(this, "FNC1 Found", Toast.LENGTH_SHORT).show();
+                        /**
+                         * 1) read first character if it's(fcn1), then continue
+                         *
+                         * 2) read first 2 chars and compare the 2 digits from the AI key Column
+                         * 3) store the AI key + the next subString in var call it as AI key name
+                         * 4) repeat step 3 four times
+                         * 5) get each row in the file and compare it if (the raw contains the 4 Strings) then it's exist
+                         * else (not exist)
+                         * */
+                        barcodeList.add(barcodeObject);
+                        barcode = barcodeObject.displayValue;
+                        if (convertStringToHex(barcode.charAt(0) + "").equals("1d")) {
+                            for (int i = 0; i < 4; i++) {
+                                //  if (convertStringToHex(barcode.charAt(aiStart + 1) + "").equals("1d")) {
+////                                    switch (barcode.substring(aiStart + , aiStart + 4)) {
+//                                        case "10":
+//                                            barcode = barcode.substring(1);
+//                                            String bn = getBN();
+//                                            barcodeData.put(KEY_BN, bn.substring(2));
+//                                            break;
+//                                        case "21":
+//                                            String sn = getSerialNumber();
+//                                            barcodeData.put(KEY_SN, sn.substring(2));
+//                                            break;
+//
+//                                    }
+//                                } else
+                                switch (barcode.substring(aiStart + 1, aiStart + 3)) {
+                                    case "01":
+                                        String gtin = getGTIN();
+                                        barcodeData.put(KEY_GTIN, gtin.substring(2));
+                                        aiStart += 16;
+                                        break;
+                                    case "17":
+                                        String xd = getXD(barcode);
+                                        barcodeData.put(KEY_XD, xd.substring(2));
+                                        aiStart += 8;
+                                        break;
+                                    case "21":
+                                        String sn = getSerialNumber();
+                                        barcodeData.put(KEY_SN, sn.substring(2));
+                                        break;
+                                    case "10":
+                                        String bn = getBN();
+                                        barcodeData.put(KEY_BN, bn.substring(2));
+                                        break;
+
+                                }
                             }
                         }
-                        Toast.makeText(this, barcode.displayValue, Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "Barcode read: " + barcode.displayValue);
+                        aiStart = 0;
+                        if (csvContentData != null)
+                        {
+                            if(checkBarCodeExistInCvsFile(csvContentData))
+                            {
+                                if(barcodeList.size()==1)
+                                    binding.firstStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
+                                if(barcodeList.size()==2)
+                                    binding.secondStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
+                                if(barcodeList.size()==3)
+                                    binding.thirdStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
+                                if(barcodeList.size()==4)
+                                    binding.fourStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
+                            }
+                            else {
+                                if(barcodeList.size()==1)
+                                    binding.firstStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
+                                if(barcodeList.size()==2)
+                                    binding.secondStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
+                                if(barcodeList.size()==3)
+                                    binding.thirdStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
+                                if(barcodeList.size()==4)
+                                    binding.fourStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
+                            }
+                        }
+                            Toast.makeText(this, "check barcode " + checkBarCodeExistInCvsFile(csvContentData), Toast.LENGTH_SHORT).show();
+//                        for (int i = 0; i < barcode.displayValue.length(); i++) {
+//                            if (convertStringToHex(barcode.displayValue.charAt(i) + "").equals("1d")) {
+////                                Toast.makeText(this, "m;88 FNC1 Found", Toast.LENGTH_SHORT).show();
+//                                Log.d(TAG, "Barcode read: " + barcode.rawValue);
+//                                this.barcode = barcode.rawValue;
+//                                this.barcode.substring(2, barcode.displayValue.length());
+//                                subStringBarCode(i);
+//
+//                            }
+//                        }
+
+                        Log.i(TAG, barcodeData.values().toString());
+                        Toast.makeText(this, barcodeObject.displayValue, Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Barcode read: " + barcodeObject.displayValue);
                     } else {
 //                        statusMessage.setText(R.string.barcode_failure);
                         Log.d(TAG, "No barcode captured, intent data is null");
@@ -137,6 +230,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else {
                 }
                 break;
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -172,6 +266,7 @@ public class HomeActivity extends AppCompatActivity {
 
         return null;
     }
+
     protected boolean shouldAskPermissions() {
         return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
     }
@@ -185,6 +280,7 @@ public class HomeActivity extends AppCompatActivity {
         int requestCode = 200;
         requestPermissions(permissions, requestCode);
     }
+
     private List<String[]> readCVSFromAssetFolder(String path) {
         List<String[]> csvLine = new ArrayList<>();
         try {
@@ -198,13 +294,91 @@ public class HomeActivity extends AppCompatActivity {
         return csvLine;
     }
 
+    private boolean checkBarCodeExistInCvsFile(List<String[]> result) {
+
+        for (int i = 0; i < result.size(); i++) {
+            String[] rows = result.get(i);
+            if (barcodeData.get(KEY_GTIN).equals(rows[0]) &&barcodeData.get(KEY_SN).equals(rows[1]) && barcodeData.get(KEY_BN).equals(rows[2])) {
+                if (checkExpiredDate(rows[3]))
+                    return true;
+            }
+
+
+        }
+        return false;
+    }
+
+    private static String KEY_GTIN = "GTIN";
+    private static String KEY_SN = "SN";
+    private static String KEY_BN = "BN";
+    private static String KEY_XD = "XD";
+
     private void printCVSContent(List<String[]> result) {
         String cvsColumn = "";
         for (int i = 0; i < result.size(); i++) {
             String[] rows = result.get(i);
-            cvsColumn += rows[0] +" " +rows[1] +" "   +rows[2] +" "   +rows[3]  + "\n";
-            Log.e("Row "+i,rows[0] +" " +rows[1] +" "   +rows[2] +" "   +rows[3]);
+            cvsColumn += rows[0] + " " + rows[1] + " " + rows[2] + " " + rows[3] + "\n";
+            Log.e("Row " + i, rows[0] + " " + rows[1] + " " + rows[2] + " " + rows[3]);
         }
         Toast.makeText(this, cvsColumn, Toast.LENGTH_SHORT).show();
+    }
+
+
+    String barcode;
+
+    private String getGTIN() {
+
+        return barcode.substring(aiStart + 1, aiStart + 17);
+    }
+
+    private String getXD(String barCode) {
+        return barCode.substring(aiStart + 1, aiStart + 9);
+    }
+
+    private String getSerialNumber() {
+        String xd = "";
+        for (int i = aiStart; i < barcode.length(); i++) {
+            if (convertStringToHex(barcode.charAt(i) + "").equals("1d") && i > aiStart) {
+                xd = barcode.substring(aiStart + 1, i);
+                aiStart += xd.length() + 1;
+                return xd;
+            } else if (i == barcode.length() - 1) {
+                xd = barcode.substring(aiStart + 1);
+                aiStart += xd.length();
+            }
+
+        }
+        return xd;
+    }
+
+    private String getBN() {
+        String bn = "";
+        for (int i = aiStart; i < barcode.length(); i++) {
+            if (convertStringToHex(barcode.charAt(i) + "").equals("1d") && i > aiStart) {
+                bn = barcode.substring(aiStart + 1, i);
+                aiStart += bn.length() + 1;
+                break;
+            }
+            if (i == barcode.length() - 1) {
+                bn = barcode.substring(aiStart + 1);
+                aiStart += bn.length();
+
+            }
+        }
+
+        return bn;
+    }
+
+    private boolean checkExpiredDate(String expireDateFromFile) {
+        String barcodeExpireDate = barcodeData.get(KEY_XD);
+        String[] dateInArray = expireDateFromFile.split("/");
+        String day = barcodeExpireDate.substring(4, 6);
+        String month = barcodeExpireDate.substring(2, 4);
+        String year = String.format("20%s", barcodeExpireDate.substring(0, 2));
+
+        if (dateInArray[0].equals(day) && dateInArray[1].equals(month) && dateInArray[2].equals(year))
+            return true;
+
+        return false;
     }
 }

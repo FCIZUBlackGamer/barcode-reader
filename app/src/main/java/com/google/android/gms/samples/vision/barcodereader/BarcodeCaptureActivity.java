@@ -58,7 +58,7 @@ import java.io.IOException;
  * rear facing camera. During detection overlay graphics are drawn to indicate the position,
  * size, and ID of each barcode.
  */
-public final class BarcodeCaptureActivity extends AppCompatActivity implements BarcodeGraphicTracker.BarcodeUpdateListener {
+public final class BarcodeCaptureActivity extends AppCompatActivity implements BarcodeGraphicTracker.BarcodeUpdateListener, QRCodeDetectedInterface {
     private static final String TAG = "Barcode-reader";
 
     // intent request code to handle updating play services if needed.
@@ -367,6 +367,27 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onQRCodeDetected() {
+        BarcodeGraphic graphic = mGraphicOverlay.getGraphics().get(0);
+        Barcode barcode = null;
+        if (graphic != null) {
+            barcode = graphic.getBarcode();
+            if (barcode != null) {
+                Intent data = new Intent();
+                data.putExtra(BarcodeObject, barcode);
+                setResult(CommonStatusCodes.SUCCESS, data);
+                finish();
+            }
+            else {
+                Log.d(TAG, "barcode data is null");
+            }
+        }
+        else {
+            Log.d(TAG,"no barcode detected");
+        }
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
