@@ -47,6 +47,16 @@
         <activity
             android:name=".BarcodeCaptureActivity"
             android:label="Read Barcode" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.google.android.gms.samples.vision.barcodereader.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
 </manifest>

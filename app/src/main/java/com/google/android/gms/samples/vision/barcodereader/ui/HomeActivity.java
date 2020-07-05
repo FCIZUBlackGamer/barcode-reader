@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +14,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
+import android.os.ParcelFileDescriptor;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -28,7 +31,9 @@ import org.apache.commons.codec.binary.Hex;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,20 +112,45 @@ public class HomeActivity extends AppCompatActivity {
                     Uri uri = data.getData();
                     Log.d(TAG, "File Uri: " + uri.toString());
                     // Get the path
-                    String path = null;
+                   String path = null;
+//                    try {
+//                        if (VersionUtils.isAfter26()) {
+//                            path = PathUtil.getPath(this, uri);
+//                        } else {
+//                            path = getPath(this, uri);
+//                        }
+//                        csvContentData = readCVSFromAssetFolder(path);
+//                        printCVSContent(csvContentData);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    }
+
+//TODO: to solve problem of android 10
+                    /*
+                     * Try to open the file for "read" access using the
+                     * returned URI. If the file isn't found, write to the
+                     * error log and return.
+                     */
+                    ParcelFileDescriptor inputPFD = null;
                     try {
-                        if (VersionUtils.isAfter26()) {
-                            path = PathUtil.getPath(this, uri);
-                        } else {
-                            path = getPath(this, uri);
-                        }
-                        csvContentData = readCVSFromAssetFolder(path);
-                        printCVSContent(csvContentData);
-                    } catch (URISyntaxException e) {
+                        /*
+                         * Get the content resolver instance for this context, and use it
+                         * to get a ParcelFileDescriptor for the file.
+                         */
+                       inputPFD = getContentResolver().openFileDescriptor(uri, "r");
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                        Log.e("MainActivity", "File not found.");
+                        Toast.makeText(this,"file not found.",Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    // Get a regular file descriptor for the file
+                    FileDescriptor fd = inputPFD.getFileDescriptor();
+                    csvContentData = readCVSFromAssetFolder(fd);
+                     printCVSContent(csvContentData);
+
                     Log.d(TAG, "File Path: " + path);
-                    binding.textView.setText(path);
+                    binding.textView.setText(uri.getPath());
                     // Get the file instance
                     // File file = new File(path);
                     // Initiate the upload
@@ -131,17 +161,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (data != null) {
 
                         Barcode barcodeObject = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-//                        statusMessage.setText(R.string.barcode_success);
-//                        barcodeValue.setText(barcode.displayValue);
-                        /**
-                         * 1) read first character if it's(fcn1), then continue
-                         *
-                         * 2) read first 2 chars and compare the 2 digits from the AI key Column
-                         * 3) store the AI key + the next subString in var call it as AI key name
-                         * 4) repeat step 3 four times
-                         * 5) get each row in the file and compare it if (the raw contains the 4 Strings) then it's exist
-                         * else (not exist)
-                         * */
+
                         barcodeList.add(barcodeObject);
                         barcode = barcodeObject.displayValue;
                         if (convertStringToHex(barcode.charAt(0) + "").equals("1d")) {
@@ -209,16 +229,7 @@ public class HomeActivity extends AppCompatActivity {
                             }
                         }
                             Toast.makeText(this, "check barcode " + checkBarCodeExistInCvsFile(csvContentData), Toast.LENGTH_SHORT).show();
-//                        for (int i = 0; i < barcode.displayValue.length(); i++) {
-//                            if (convertStringToHex(barcode.displayValue.charAt(i) + "").equals("1d")) {
-////                                Toast.makeText(this, "m;88 FNC1 Found", Toast.LENGTH_SHORT).show();
-//                                Log.d(TAG, "Barcode read: " + barcode.rawValue);
-//                                this.barcode = barcode.rawValue;
-//                                this.barcode.substring(2, barcode.displayValue.length());
-//                                subStringBarCode(i);
-//
-//                            }
-//                        }
+
 
                         Log.i(TAG, barcodeData.values().toString());
                         Toast.makeText(this, barcodeObject.displayValue, Toast.LENGTH_SHORT).show();
@@ -293,7 +304,13 @@ public class HomeActivity extends AppCompatActivity {
         }
         return csvLine;
     }
-
+    private List<String[]> readCVSFromAssetFolder(FileDescriptor path) {
+        List<String[]> csvLine = new ArrayList<>();
+        input = new FileInputStream(path);
+        ReadCSV csv = new ReadCSV(input);
+        csvLine = csv.read();
+        return csvLine;
+    }
     private boolean checkBarCodeExistInCvsFile(List<String[]> result) {
 
         for (int i = 0; i < result.size(); i++) {
