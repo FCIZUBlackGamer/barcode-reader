@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/show_and_add_unit_nav_graph"
+    app:startDestination="@id/ShowUnitsList">
+
+    <fragment
+        android:id="@+id/ShowUnitsList"
+        android:name="com.google.android.gms.samples.vision.barcodereader.ui.ShowUnitsList"
+        android:label="ShowUnitsList" >
+        <argument android:name="productList"
+            app:argType="com.google.android.gms.samples.vision.barcodereader.model.accept_service_request_model.Products"
+            android:defaultValue="@null"/>
+        <action
+            android:id="@+id/action_showUnitsList2_to_showAndAddUnitDialog"
+            app:destination="@id/showAndAddUnitDialog" />
+    </fragment>
+    <dialog
+        android:id="@+id/showAndAddUnitDialog"
+        android:name="com.google.android.gms.samples.vision.barcodereader.ui.ShowAndAddUnitDialog"
+        android:label="ShowAndAddUnitDialog" />
+</navigation>

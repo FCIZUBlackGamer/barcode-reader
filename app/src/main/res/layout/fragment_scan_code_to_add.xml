@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/_16sdp"
+            android:id="@+id/topLayout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+           >
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="300dp">
+            <com.google.android.gms.samples.vision.barcodereader.ui.camera.GraphicOverlay
+                android:id="@+id/graphicOverlay"
+                android:layout_width="match_parent"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_16sdp"
+                android:layout_height="300dp" />
+            <SurfaceView
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:id="@+id/camera_view"
+                android:layout_marginStart="@dimen/_16sdp"
+                android:layout_marginEnd="@dimen/_16sdp" />
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/GTIN_layout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="@dimen/_32sdp"
+                    android:layout_marginEnd="@dimen/_32sdp"
+                    android:hint="@string/gtin_txt"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/GTINTxt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:inputType="textPersonName"
+                        android:maxLines="3"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/SerialNumberInputLayout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="@dimen/_32sdp"
+                    android:layout_marginEnd="@dimen/_32sdp"
+                    android:hint="@string/serial_number_txt"
+                    app:layout_constraintEnd_toEndOf="@+id/GTIN_layout"
+                    app:layout_constraintStart_toStartOf="@id/GTIN_layout"
+                    app:layout_constraintTop_toBottomOf="@id/GTIN_layout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/SerialNumberTxt"
+                        android:layout_width="match_parent"
+                        android:drawablePadding="5dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_marginStart="@dimen/_32sdp"
+                    android:layout_marginEnd="@dimen/_32sdp"
+                    android:layout_marginTop="4dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/batch_number_txt"
+                    android:id="@+id/batchNumberLayout"
+                    app:layout_constraintStart_toStartOf="@id/SerialNumberInputLayout"
+                    app:layout_constraintTop_toBottomOf="@id/SerialNumberInputLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/batchNumberTxt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="5dp"
+                        android:inputType="phone" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="@dimen/_32sdp"
+                    android:layout_marginEnd="@dimen/_32sdp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/expire_date_txt"
+                    android:id="@+id/addressInputLayout"
+                    app:layout_constraintEnd_toEndOf="@id/batchNumberLayout"
+                    app:layout_constraintStart_toStartOf="@id/batchNumberLayout"
+                    app:layout_constraintTop_toBottomOf="@id/batchNumberLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/expiredDateTxt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="5dp"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="32dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="64dp"
+                    app:layout_constraintTop_toBottomOf="@id/addressInputLayout">
+
+                    <Button
+                        android:id="@+id/cancel_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/cancel_btn_txt"
+                        android:paddingStart="32dp"
+                        android:layout_marginEnd="8dp"
+
+                        style="@style/CancelButtonStyle"
+                        android:paddingEnd="32dp"
+                        android:textColorHint="@color/colorWhite" />
+
+                    <Button
+                        android:id="@+id/addNewProductBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorPrimary"
+                        android:hint="@string/add_txt"
+                        android:paddingStart="40dp"
+                        android:paddingEnd="40dp"
+                        android:textColorHint="@color/colorWhite" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

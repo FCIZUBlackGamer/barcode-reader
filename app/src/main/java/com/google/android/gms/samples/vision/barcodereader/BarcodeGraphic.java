@@ -49,7 +49,7 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
     BarcodeGraphic(GraphicOverlay overlay) {
         super(overlay);
         this.context = overlay.getContext();
-        mCallback = (BarcodeCaptureActivity) context;
+//        mCallback = (BarcodeCaptureActivity) context;
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
 
@@ -104,6 +104,6 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
 
 //        // Draws a label at the bottom of the barcode indicate the barcode value that was detected.
 //        canvas.drawText(barcode.rawValue, rect.left, rect.bottom, mTextPaint);
-        mCallback.onQRCodeDetected();
+//        mCallback.onQRCodeDetected();
     }
 }

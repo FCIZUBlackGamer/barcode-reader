@@ -7,7 +7,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -16,16 +16,19 @@
         android:hardwareAccelerated="true"
         android:icon="@drawable/icon"
         android:label="MultiTrackerApp"
-        android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
-        android:theme="@style/Theme.AppCompat"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".ui.HomeActivity">
+        <activity android:name=".ui.Home2Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".ui.HomeActivity">
+
         </activity>
 
         <meta-data
@@ -37,13 +40,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
+            android:label="@string/title_activity_main"></activity>
         <activity
             android:name=".BarcodeCaptureActivity"
             android:label="Read Barcode" />
@@ -51,8 +48,8 @@
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.google.android.gms.samples.vision.barcodereader.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />

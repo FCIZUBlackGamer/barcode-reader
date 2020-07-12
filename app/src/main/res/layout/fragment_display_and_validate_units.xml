@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite"
+
+        >
+
+        <TextView
+            android:id="@+id/type_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_32sdp"
+            android:text="@string/type_txt"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_17ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/typeOfSource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:orientation="horizontal"
+
+            app:layout_constraintBottom_toBottomOf="@id/type_txt"
+            app:layout_constraintStart_toEndOf="@id/type_txt"
+            app:layout_constraintTop_toTopOf="@id/type_txt">
+
+            <RadioButton
+                android:id="@+id/batchFileRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:checked="true"
+                android:text="@string/batch_File_txt"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/_15ssp"
+                tools:layout_editor_absoluteX="136dp"
+                tools:layout_editor_absoluteY="154dp" />
+
+            <RadioButton
+                android:id="@+id/notifyIdRadioButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notification_id_txt"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/_15ssp"
+                tools:layout_editor_absoluteX="136dp"
+                tools:layout_editor_absoluteY="154dp" />
+        </RadioGroup>
+
+        <ImageButton
+            android:id="@+id/chooseFileBtn"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:background="@color/colorPrimary"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/ic_attach_file_white_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/filePathTxtView"
+            app:layout_constraintTop_toBottomOf="@+id/typeOfSource" />
+
+        <TextView
+            android:id="@+id/filePathTxtView"
+            android:layout_width="@dimen/_200sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:background="@drawable/file_location_background"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:text="File path"
+            android:textAlignment="textStart"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="@id/chooseFileBtn"
+            app:layout_constraintStart_toStartOf="@id/type_txt"
+            app:layout_constraintTop_toTopOf="@id/chooseFileBtn"
+            tools:ignore="RtlCompat" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/notificationListViewInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="@dimen/_252sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/typeOfSource"
+            app:layout_constraintStart_toStartOf="@+id/type_txt"
+            app:layout_constraintTop_toBottomOf="@id/filePathTxtView">
+
+            <AutoCompleteTextView
+                android:id="@+id/notificationListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="15"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/productListLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/notificationListViewInputLayout">
+
+            <fragment
+                android:id="@+id/show_units_list_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8sdp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/_8sdp"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/show_and_add_unit_nav_graph" />
+
+            <Button
+                android:id="@+id/validate_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/validate_txt"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/show_units_list_fragment" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

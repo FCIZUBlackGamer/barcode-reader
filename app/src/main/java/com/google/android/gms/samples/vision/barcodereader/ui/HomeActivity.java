@@ -4,18 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.annotation.TargetApi;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.os.ParcelFileDescriptor;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -24,29 +20,22 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.samples.vision.barcodereader.BarcodeCaptureActivity;
 import com.google.android.gms.samples.vision.barcodereader.R;
 import com.google.android.gms.samples.vision.barcodereader.databinding.HomeActivityBinding;
+import com.google.android.gms.samples.vision.barcodereader.utils.ReadCSV;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.opencsv.CSVReader;
 
 import org.apache.commons.codec.binary.Hex;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -60,6 +49,10 @@ public class HomeActivity extends AppCompatActivity {
     private static final int RC_BARCODE_CAPTURE = 9001;
     private HashMap<String, String> barcodeData = new HashMap<>();
     int aiStart = 0;
+    private static String KEY_GTIN = "GTIN";
+    private static String KEY_SN = "SN";
+    private static String KEY_BN = "BN";
+    private static String KEY_XD = "XD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,42 +105,27 @@ public class HomeActivity extends AppCompatActivity {
                     Uri uri = data.getData();
                     Log.d(TAG, "File Uri: " + uri.toString());
                     // Get the path
-                   String path = null;
-//                    try {
-//                        if (VersionUtils.isAfter26()) {
-//                            path = PathUtil.getPath(this, uri);
-//                        } else {
-//                            path = getPath(this, uri);
-//                        }
-//                        csvContentData = readCVSFromAssetFolder(path);
-//                        printCVSContent(csvContentData);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    }
+                    String path = null;
 
-//TODO: to solve problem of android 10
-                    /*
-                     * Try to open the file for "read" access using the
-                     * returned URI. If the file isn't found, write to the
-                     * error log and return.
-                     */
+                    //TODO: to solve problem of android 10
+
                     ParcelFileDescriptor inputPFD = null;
                     try {
                         /*
                          * Get the content resolver instance for this context, and use it
                          * to get a ParcelFileDescriptor for the file.
                          */
-                       inputPFD = getContentResolver().openFileDescriptor(uri, "r");
+                        inputPFD = getContentResolver().openFileDescriptor(uri, "r");
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                         Log.e("MainActivity", "File not found.");
-                        Toast.makeText(this,"file not found.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "file not found.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     // Get a regular file descriptor for the file
                     FileDescriptor fd = inputPFD.getFileDescriptor();
                     csvContentData = readCVSFromAssetFolder(fd);
-                     printCVSContent(csvContentData);
+                    printCVSContent(csvContentData);
 
                     Log.d(TAG, "File Path: " + path);
                     binding.textView.setText(uri.getPath());
@@ -166,20 +144,6 @@ public class HomeActivity extends AppCompatActivity {
                         barcode = barcodeObject.displayValue;
                         if (convertStringToHex(barcode.charAt(0) + "").equals("1d")) {
                             for (int i = 0; i < 4; i++) {
-                                //  if (convertStringToHex(barcode.charAt(aiStart + 1) + "").equals("1d")) {
-////                                    switch (barcode.substring(aiStart + , aiStart + 4)) {
-//                                        case "10":
-//                                            barcode = barcode.substring(1);
-//                                            String bn = getBN();
-//                                            barcodeData.put(KEY_BN, bn.substring(2));
-//                                            break;
-//                                        case "21":
-//                                            String sn = getSerialNumber();
-//                                            barcodeData.put(KEY_SN, sn.substring(2));
-//                                            break;
-//
-//                                    }
-//                                } else
                                 switch (barcode.substring(aiStart + 1, aiStart + 3)) {
                                     case "01":
                                         String gtin = getGTIN();
@@ -204,38 +168,34 @@ public class HomeActivity extends AppCompatActivity {
                             }
                         }
                         aiStart = 0;
-                        if (csvContentData != null)
-                        {
-                            if(checkBarCodeExistInCvsFile(csvContentData))
-                            {
-                                if(barcodeList.size()==1)
+                        if (csvContentData != null) {
+                            if (checkBarCodeExistInCvsFile(csvContentData)) {
+                                if (barcodeList.size() == 1)
                                     binding.firstStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
-                                if(barcodeList.size()==2)
+                                if (barcodeList.size() == 2)
                                     binding.secondStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
-                                if(barcodeList.size()==3)
+                                if (barcodeList.size() == 3)
                                     binding.thirdStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
-                                if(barcodeList.size()==4)
+                                if (barcodeList.size() == 4)
                                     binding.fourStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_ok_tint_background));
-                            }
-                            else {
-                                if(barcodeList.size()==1)
+                            } else {
+                                if (barcodeList.size() == 1)
                                     binding.firstStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
-                                if(barcodeList.size()==2)
+                                if (barcodeList.size() == 2)
                                     binding.secondStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
-                                if(barcodeList.size()==3)
+                                if (barcodeList.size() == 3)
                                     binding.thirdStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
-                                if(barcodeList.size()==4)
+                                if (barcodeList.size() == 4)
                                     binding.fourStateBtn.setBackgroundTintList(getResources().getColorStateList(R.color.state_false_tint_background));
                             }
                         }
-                            Toast.makeText(this, "check barcode " + checkBarCodeExistInCvsFile(csvContentData), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "check barcode " + checkBarCodeExistInCvsFile(csvContentData), Toast.LENGTH_SHORT).show();
 
 
                         Log.i(TAG, barcodeData.values().toString());
                         Toast.makeText(this, barcodeObject.displayValue, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "Barcode read: " + barcodeObject.displayValue);
                     } else {
-//                        statusMessage.setText(R.string.barcode_failure);
                         Log.d(TAG, "No barcode captured, intent data is null");
                     }
                 } else {
@@ -247,11 +207,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public static String convertStringToHex(String str) {
-
-        // display in uppercase
-        //char[] chars = Hex.encodeHex(str.getBytes(StandardCharsets.UTF_8), false);
-
-        // display in lowercase, default
         char[] chars = Hex.encodeHex(str.getBytes(StandardCharsets.UTF_8));
         Log.e("Hex", String.valueOf(chars));
         return String.valueOf(chars);
@@ -269,7 +224,7 @@ public class HomeActivity extends AppCompatActivity {
                     return cursor.getString(column_index);
                 }
             } catch (Exception e) {
-                // Eat it
+
             }
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();
@@ -304,6 +259,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         return csvLine;
     }
+
     private List<String[]> readCVSFromAssetFolder(FileDescriptor path) {
         List<String[]> csvLine = new ArrayList<>();
         input = new FileInputStream(path);
@@ -311,24 +267,19 @@ public class HomeActivity extends AppCompatActivity {
         csvLine = csv.read();
         return csvLine;
     }
+
     private boolean checkBarCodeExistInCvsFile(List<String[]> result) {
-
-        for (int i = 0; i < result.size(); i++) {
-            String[] rows = result.get(i);
-            if (barcodeData.get(KEY_GTIN).equals(rows[0]) &&barcodeData.get(KEY_SN).equals(rows[1]) && barcodeData.get(KEY_BN).equals(rows[2])) {
-                if (checkExpiredDate(rows[3]))
-                    return true;
+        if (result != null)
+            for (int i = 0; i < result.size(); i++) {
+                String[] rows = result.get(i);
+                if (barcodeData.get(KEY_GTIN).equals(rows[0]) && barcodeData.get(KEY_SN).equals(rows[1]) && barcodeData.get(KEY_BN).equals(rows[2])) {
+                    if (checkExpiredDate(rows[3]))
+                        return true;
+                }
             }
-
-
-        }
         return false;
     }
 
-    private static String KEY_GTIN = "GTIN";
-    private static String KEY_SN = "SN";
-    private static String KEY_BN = "BN";
-    private static String KEY_XD = "XD";
 
     private void printCVSContent(List<String[]> result) {
         String cvsColumn = "";
@@ -339,7 +290,6 @@ public class HomeActivity extends AppCompatActivity {
         }
         Toast.makeText(this, cvsColumn, Toast.LENGTH_SHORT).show();
     }
-
 
     String barcode;
 
@@ -395,7 +345,6 @@ public class HomeActivity extends AppCompatActivity {
 
         if (dateInArray[0].equals(day) && dateInArray[1].equals(month) && dateInArray[2].equals(year))
             return true;
-
         return false;
     }
 }

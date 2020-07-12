@@ -12,4 +12,20 @@
     <string name="barcode_success">Barcode read successfully</string>
     <string name="barcode_failure">No barcode captured</string>
     <string name="barcode_error">"Error reading barcode: %1$s"</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="batch_File_txt">Batch File</string>
+    <string name="notification_id_txt">Notification Id</string>
+    <string name="type_txt">Type</string>
+    <string name="validate_txt">Validate</string>
+    <string name="gtin_txt">GTIN</string>
+    <string name="serial_number_txt">Serial Number</string>
+    <string name="batch_number_txt">Batch Number</string>
+    <string name="expire_date_txt">Expire Date</string>
+    <string name="cancel_btn_txt">Cancel</string>
+    <string name="add_txt">Add</string>
+    <string name="xd_txt">XD</string>
+    <string name="bn_txt">BN</string>
+    <string name="sn_txt">SN</string>
 </resources>
