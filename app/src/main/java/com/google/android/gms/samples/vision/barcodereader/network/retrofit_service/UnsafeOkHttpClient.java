@@ -1,4 +1,4 @@
-package com.google.android.gms.samples.vision.barcodereader.model.retrofit_service;
+package com.google.android.gms.samples.vision.barcodereader.network.retrofit_service;
 
 import java.security.cert.CertificateException;
 

@@ -1,4 +1,4 @@
-package com.google.android.gms.samples.vision.barcodereader.model.accept_service_response;
+package com.google.android.gms.samples.vision.barcodereader.model.notify__dispatch_accept.response;
 
 import com.google.android.gms.samples.vision.barcodereader.model.accept_service_request_model.Product;
 
@@ -7,9 +7,8 @@ import org.simpleframework.xml.Root;
 
 import java.util.List;
 
-@Root(name = "AcceptServiceRequest")
-
-public class AcceptServiceResponse {
+@Root (name = "AcceptDispatchServiceResponse")
+public class AcceptDispatchServiceResponse {
     @Element(name = "NOTIFICATIONID")
     String notificationId;
     @Element(name = "PRODUCTLIST", required =false  )
@@ -30,4 +29,5 @@ public class AcceptServiceResponse {
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
     }
+
 }

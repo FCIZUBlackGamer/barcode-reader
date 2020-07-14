@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.bobekos:SimpleBarcodeScanner:1.0.23@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/234705a933dc370430a099076c73628a/jetified-SimpleBarcodeScanner-1.0.23/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/234705a933dc370430a099076c73628a/jetified-SimpleBarcodeScanner-1.0.23/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bobekos/SimpleBarcodeScanner/1.0.23/6187d50a4117e1e297aa47bb196e247df583b49d/SimpleBarcodeScanner-1.0.23-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

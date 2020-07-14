@@ -7,6 +7,7 @@ import java.util.List;
 
 @Root(name = "AcceptServiceRequest")
 public class AcceptServiceRequest {
+
     @Element(name = "PRODUCTLIST")
     private List<Product> productList;
 

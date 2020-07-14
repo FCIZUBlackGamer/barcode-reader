@@ -20,18 +20,19 @@
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
                 android:layout_height="300dp">
-            <com.google.android.gms.samples.vision.barcodereader.ui.camera.GraphicOverlay
-                android:id="@+id/graphicOverlay"
-                android:layout_width="match_parent"
-                android:layout_marginStart="@dimen/_16sdp"
-                android:layout_marginEnd="@dimen/_16sdp"
-                android:layout_height="300dp" />
+
             <SurfaceView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:id="@+id/camera_view"
                 android:layout_marginStart="@dimen/_16sdp"
                 android:layout_marginEnd="@dimen/_16sdp" />
+                <View
+                    android:layout_width="@dimen/_100sdp"
+                    android:layout_height="@dimen/_100sdp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/rectangle_shape"
+                    />
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
             <LinearLayout

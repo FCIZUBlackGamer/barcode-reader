@@ -9,7 +9,7 @@ import org.simpleframework.xml.Root;
 import java.io.Serializable;
 import java.util.Date;
 
-@Root(name = "PRODUCT")
+@Root(name = "PRODUCT" )
 public class Product implements Parcelable {
     @Element(name = "GTIN")
     private String GTIN ;

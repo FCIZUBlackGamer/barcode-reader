@@ -1,9 +1,15 @@
 package com.google.android.gms.samples.vision.barcodereader.ui;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -30,6 +36,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,6 +52,7 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
     FragmentScanCodeToAddBinding binding;
     Product product;
     NavController navController;
+    private static final int RC_HANDLE_CAMERA_PERM = 2;
 
     public ScanBarcode() {
         // Required empty public constructor
@@ -68,7 +76,9 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_scan_code_to_add, container, false);
         scanBarcodeViewModel = ViewModelProviders.of(this).get(ScanBarcodeViewModel.class);
         navController = Navigation.findNavController(requireActivity(), R.id.show_units_list_fragment);
-
+        if (shouldAskPermissions()) {
+            askPermissions();
+        }
         return binding.getRoot();
     }
 
@@ -90,7 +100,13 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    cameraSource.start(binding.cameraView.getHolder());
+                    int rc = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA);
+                    if (rc == PackageManager.PERMISSION_GRANTED) {
+                        cameraSource.start(binding.cameraView.getHolder());
+                    } else {
+                        requestCameraPermission();
+                    }
+
                 } catch (IOException ie) {
                     Log.e("CAMERA SOURCE", ie.getMessage());
                 }
@@ -98,6 +114,7 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
             }
 
             @Override
@@ -106,7 +123,7 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
             }
 
         });
-        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(binding.graphicOverlay, getContext());
+//        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(binding.graphicOverlay, getContext());
 //        barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
         binding.addNewProductBtn.setOnClickListener(this);
         binding.cancelBtn.setOnClickListener(this);
@@ -139,7 +156,29 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
         navController.popBackStack();
     }
 
+private static final String TAG = ScanBarcode.class.getSimpleName();
+    private void requestCameraPermission() {
+        Log.w(TAG, "Camera permission is not granted. Requesting permission");
 
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
+
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+                Manifest.permission.CAMERA)) {
+            ActivityCompat.requestPermissions(requireActivity(), permissions, RC_HANDLE_CAMERA_PERM);
+            return;
+        }
+
+        final Activity thisActivity = requireActivity();
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions(thisActivity, permissions,
+                        RC_HANDLE_CAMERA_PERM);
+            }
+        };
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -152,6 +191,17 @@ public class ScanBarcode extends Fragment implements  View.OnClickListener {
         }
     }
 
-
+    @TargetApi(23)
+    protected void askPermissions() {
+        String[] permissions = {
+                "android.permission.READ_EXTERNAL_STORAGE",
+                "android.permission.WRITE_EXTERNAL_STORAGE"
+        };
+        int requestCode = 200;
+        requestPermissions(permissions, requestCode);
+    }
+    protected boolean shouldAskPermissions() {
+        return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+    }
 
 }

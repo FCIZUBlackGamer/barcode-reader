@@ -1,4 +1,4 @@
-package com.google.android.gms.samples.vision.barcodereader.model.retrofit_service;
+package com.google.android.gms.samples.vision.barcodereader.network.retrofit_service;
 
 
 import java.util.concurrent.TimeUnit;
@@ -11,7 +11,7 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 public class RetrofitInstance {
     private static Retrofit retrofit = null;
     private static final String TAG = "RetrofitInstance";
-    private static final String BASE_URL = "https://192.168.1.3:4430/" ;
+    private static final String BASE_URL = "https://dtts80.tiga.com.tr:443" ;
 
     public static MyServicesInterface getService() {
         if (retrofit == null) {
