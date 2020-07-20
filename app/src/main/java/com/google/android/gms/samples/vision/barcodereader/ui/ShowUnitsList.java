@@ -55,6 +55,9 @@ public class ShowUnitsList extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         if (getArguments() != null)
             productArrayList = getArguments().getParcelableArrayList(KEY_PRODUCTS_LIST);
+        if(savedInstanceState!=null)
+            productArrayList = savedInstanceState.getParcelableArrayList(KEY_PRODUCTS_LIST);
+
         super.onCreate(savedInstanceState);
 
     }
@@ -65,8 +68,6 @@ public class ShowUnitsList extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_show_units_list, container, false);
         navController = Navigation.findNavController(requireActivity(), R.id.show_units_list_fragment);
-        if (getArguments() != null)
-            productArrayList = getArguments().getParcelableArrayList(KEY_PRODUCTS_LIST);
         return binding.getRoot();
     }
 
@@ -94,10 +95,16 @@ public class ShowUnitsList extends Fragment {
         super.onStart();
         EventBus.getDefault().register(this);
     }
+
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(KEY_PRODUCTS_LIST,productArrayList);
+    }
 }

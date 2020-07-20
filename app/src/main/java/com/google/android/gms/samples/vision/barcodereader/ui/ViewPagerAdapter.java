@@ -3,12 +3,10 @@ package com.google.android.gms.samples.vision.barcodereader.ui;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.android.gms.samples.vision.barcodereader.ui.add_unit_manually.AddUnitManually;
+import com.google.android.gms.samples.vision.barcodereader.ui.scan_barcode_to_add.ScanBarcode;
 
 public class ViewPagerAdapter  extends FragmentStateAdapter {
 

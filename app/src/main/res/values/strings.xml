@@ -28,4 +28,6 @@
     <string name="xd_txt">XD</string>
     <string name="bn_txt">BN</string>
     <string name="sn_txt">SN</string>
+    <string name="scan_barcode_to_be_validated_txt">Scan barcode to be validated.</string>
+    <string name="scan_txt">Scan</string>
 </resources>

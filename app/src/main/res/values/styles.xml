@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
 
     </style>
 
@@ -56,5 +58,12 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
 
     </style>
+    <style name="MyTheme" parent="@android:style/Theme">
+
+    </style>
+    <declare-styleable name="BatteryView">
+    <attr name="bv_charging" format="boolean" />
+    <attr name="bv_percent" format="integer" />
+</declare-styleable>
 
 </resources>

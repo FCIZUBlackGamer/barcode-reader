@@ -1,8 +1,5 @@
 package com.google.android.gms.samples.vision.barcodereader.ui.display_and_validate_units;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -34,6 +31,8 @@ public class DisplayAndValidateUnitsViewModel extends ViewModel {
     }
 
     private MutableLiveData getProductList (List<String[]> result) {
+        if(productsList.size()>0)
+            productsList.clear();
         for (int i = 0; i < result.size(); i++) {
             String[] rows = result.get(i);
             if(i != 0) {

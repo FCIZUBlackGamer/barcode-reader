@@ -35,18 +35,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
-import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DisplayAndValidateUnits extends Fragment {
+public class DisplayAndValidateUnits extends Fragment implements View.OnClickListener {
     private FragmentDisplayAndValidateUnitsBinding binding;
     private static final int FILE_SELECT_CODE = 0;
     private ParcelFileDescriptor inputPFD = null;
     private DisplayAndValidateUnitsViewModel viewModel;
     private static final String KEY_PRODUCTS_LIST = "productList";
-    private NavController navController;
+    private NavController navController,mainNavController;
+
     private ArrayList<Product> productArrayList  = null;
     FileDescriptor fd;
     public DisplayAndValidateUnits() {
@@ -60,14 +60,11 @@ public class DisplayAndValidateUnits extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_display_and_validate_units, container, false);
         viewModel = ViewModelProviders.of(this).get(DisplayAndValidateUnitsViewModel.class);
+        mainNavController = Navigation.findNavController(requireActivity(),R.id.main_content);
         showAndHideViews();
         getProductList(fd);
-        binding.chooseFileBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFileChooser();
-            }
-        });
+        binding.chooseFileBtn.setOnClickListener(this);
+        binding.validateBtn.setOnClickListener(this);
         return binding.getRoot();
     }
 
@@ -112,7 +109,6 @@ public class DisplayAndValidateUnits extends Fragment {
                 if (resultCode == RESULT_OK) {
                     // Get the Uri of the selected file
                     Uri uri = data.getData();
-                    Log.d(TAG, "File Uri: " + uri.toString());
                     // Get the path
                     String path = null;
                     try {
@@ -125,7 +121,6 @@ public class DisplayAndValidateUnits extends Fragment {
                     }
                      fd = inputPFD.getFileDescriptor();
                     viewModel.readDataFromFileAndGetProductList(fd);
-                    Log.d(TAG, "File Path: " + path);
                     binding.filePathTxtView.setText(uri.getPath());
 
                 }
@@ -155,5 +150,14 @@ public class DisplayAndValidateUnits extends Fragment {
     }
 
 
-
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.validate_btn:
+                mainNavController.navigate(R.id.action_displayAndValidateUnits_to_validateQRCodes);
+                break;
+            case R.id.chooseFileBtn:
+                showFileChooser();
+        }
+    }
 }

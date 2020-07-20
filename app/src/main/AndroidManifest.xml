@@ -5,7 +5,6 @@
     android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.camera" />
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -20,30 +19,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".ui.Home2Activity">
+        <activity android:name=".ui.activities.Home2Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.HomeActivity">
+<!--        <activity android:name=".ui.HomeActivity">-->
 
-        </activity>
+<!--        </activity>-->
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+<!--        <meta-data-->
+<!--            android:name="com.google.android.gms.version"-->
+<!--            android:value="@integer/google_play_services_version" />-->
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
-
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main"></activity>
-        <activity
-            android:name=".BarcodeCaptureActivity"
-            android:label="Read Barcode" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
